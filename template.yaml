@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Simple Todo Export Lambda Function
+
+Parameters:
+  DynamoDBTableName:
+    Type: String
+    Default: TodoItems-Dev
+    Description: Name of the DynamoDB table to scan
+  
+  S3BucketName:
+    Type: String
+    Description: Name of the S3 bucket for CSV storage
+  
+  SQSQueueArn:
+    Type: String
+    Description: ARN of the existing SQS queue
+  
+  SNSTopicArn:
+    Type: String
+    Description: ARN of the existing SNS topic
+
+Resources:
+  TodoExportFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: .
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.9
+      Timeout: 120
+      Environment:
+        Variables:
+          DYNAMODB_TABLE: !Ref DynamoDBTableName
+          S3_BUCKET: !Ref S3BucketName
+          SNS_TOPIC: !Ref SNSTopicArn
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref DynamoDBTableName
+        - S3WritePolicy:
+            BucketName: !Ref S3BucketName
+        - S3ReadPolicy:
+            BucketName: !Ref S3BucketName
+        - SNSPublishMessagePolicy:
+            TopicName: !Select [5, !Split [":", !Ref SNSTopicArn]]
+      Events:
+        SQSEvent:
+          Type: SQS
+          Properties:
+            Queue: !Ref SQSQueueArn
+            BatchSize: 1
+
+Outputs:
+  TodoExportFunction:
+    Description: "Todo Export Lambda Function ARN"
+    Value: !GetAtt TodoExportFunction.Arn
+  
+  TodoExportFunctionIamRole:
+    Description: "Implicit IAM Role created for Todo Export function"
+    Value: !GetAtt TodoExportFunctionRole.Arn
