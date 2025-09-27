@@ -12,9 +12,9 @@ def lambda_handler(event, context):
     sns = boto3.client('sns')
     
     # Get environment variables
-    table_name = os.environ['DYNAMODB_TABLE']
-    bucket_name = os.environ['S3_BUCKET']
-    sns_topic = os.environ['SNS_TOPIC']
+    table_name = os.environ['DYNAMODB_TABLE_NAME']
+    bucket_name = os.environ['S3_BUCKET_NAME']
+    sns_topic = os.environ['SNS_TOPIC_ARN']
     
     try:
         # Scan DynamoDB table
