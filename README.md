@@ -2,7 +2,6 @@
 
 A simple AWS Lambda function that exports DynamoDB table data to CSV and provides a download link via SNS.
 
-
 Generated with AWS Q Developer.
 
 ## How it works
@@ -30,9 +29,20 @@ sam deploy --guided
 
 ## Environment Variables
 
-- `DYNAMODB_TABLE`: DynamoDB table name to scan
-- `S3_BUCKET`: S3 bucket for CSV storage
-- `SNS_TOPIC`: SNS topic ARN for notifications
+- `DYNAMODB_TABLE_NAME`: DynamoDB table name to scan
+- `S3_BUCKET_NAME`: S3 bucket for CSV storage
+- `SNS_TOPIC_ARN`: SNS topic ARN for notifications
+
+## Manual configuration
+
+If you are deploying manually, you'll need to grant the relevant permissions to the Lambda's Execution role. 
+
+* S3 Full
+* SNS Full
+* DynamoDB Read Only
+* SQS Full
+
+ALSO - Bump up the function timeout to 30 seconds from 3 seconds - 3 seconds is NOT long enough
 
 ## Testing
 
