@@ -8,7 +8,11 @@ from io import StringIO
 def lambda_handler(event, context):
     # Initialize AWS clients
     dynamodb = boto3.resource('dynamodb')
-    s3 = boto3.client('s3')
+    s3 = boto3.client(
+        's3',
+        region_name=os.environ['AWS_REGION'],
+        config=Config(signature_version='s3v4')
+    )
     sns = boto3.client('sns')
     
     # Get environment variables
