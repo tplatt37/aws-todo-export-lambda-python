@@ -4,13 +4,16 @@ import boto3
 import os
 from datetime import datetime
 from io import StringIO
+from botocore.config import Config
 
 def lambda_handler(event, context):
     # Initialize AWS clients
     dynamodb = boto3.resource('dynamodb')
+    # Must do the following to ensure regions other than us-east-1 work when presigning
     s3 = boto3.client(
         's3',
         region_name=os.environ['AWS_REGION'],
+        endpoint_url=f"https://s3.{os.environ['AWS_REGION']}.amazonaws.com",
         config=Config(signature_version='s3v4')
     )
     sns = boto3.client('sns')
